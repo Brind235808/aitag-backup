@@ -20,7 +20,8 @@ REPO = os.path.join(WORK, "repo")
 VOL_CSV = os.path.join(REPO, "mapping", "volumes.csv")
 PLAN = os.path.join(LOCAL, "plan.json")
 CONCURRENCY = int(os.environ.get("AITAG_UPLOAD_CONC", "8"))
-PACK_AHEAD = int(os.environ.get("AITAG_PACK_AHEAD", "12"))
+PACK_AHEAD = int(os.environ.get("AITAG_PACK_AHEAD", "16"))
+PACK_WORKERS = int(os.environ.get("AITAG_PACK_WORKERS", "4"))
 
 
 def load_password():
@@ -192,23 +193,40 @@ def main():
     for w in workers:
         w.start()
 
+    pack_q = queue.Queue()
     for i, entry in enumerate(plan, 1):
-        if stop_evt.is_set():
-            break
-        hb.status = f"packing {entry['kind']}"
-        try:
-            meta = packer.pack(entry)
-        except Exception as e:
-            log(f"pack failed {entry['name']}: {e}")
-            continue
-        hb.status = f"uploading {entry['kind']}"
-        log(f"queue {i}/{len(plan)} {entry['name']} {meta['archive_bytes']/2**30:.2f}GB")
+        pack_q.put((i, entry))
+    for _ in range(PACK_WORKERS):
+        pack_q.put(None)
+
+    def pack_worker():
         while not stop_evt.is_set():
             try:
-                q.put((entry, meta), timeout=10)
-                break
-            except queue.Full:
+                item = pack_q.get(timeout=2)
+            except queue.Empty:
                 continue
+            if item is None:
+                return
+            i, entry = item
+            hb.status = f"packing {entry['kind']}"
+            try:
+                meta = packer.pack(entry)
+            except Exception as e:
+                log(f"pack failed {entry['name']}: {e}")
+                continue
+            log(f"queue {i}/{len(plan)} {entry['name']} {meta['archive_bytes']/2**30:.2f}GB")
+            while not stop_evt.is_set():
+                try:
+                    q.put((entry, meta), timeout=10)
+                    break
+                except queue.Full:
+                    continue
+
+    packers = [threading.Thread(target=pack_worker, daemon=True) for _ in range(PACK_WORKERS)]
+    for w in packers:
+        w.start()
+    for w in packers:
+        w.join()
 
     for _ in workers:
         while True:
