@@ -19,8 +19,8 @@ LOCAL = os.path.join(WORK, "local")
 REPO = os.path.join(WORK, "repo")
 VOL_CSV = os.path.join(REPO, "mapping", "volumes.csv")
 PLAN = os.path.join(LOCAL, "plan.json")
-CONCURRENCY = int(os.environ.get("AITAG_UPLOAD_CONC", "2"))
-PACK_AHEAD = 3
+CONCURRENCY = int(os.environ.get("AITAG_UPLOAD_CONC", "8"))
+PACK_AHEAD = int(os.environ.get("AITAG_PACK_AHEAD", "12"))
 
 
 def load_password():
