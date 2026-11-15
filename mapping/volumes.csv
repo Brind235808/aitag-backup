@@ -110,12 +110,12 @@ aitag_meta_0008.7z,meta,19605,1693928664,,,meta/2025-12/139276/139276193.json.gz
 aitag_meta_0009.7z,meta,101103,1699930794,,,meta/2026-01/139542/139542683.json.gz,meta/2026-02/140763/140763582.json.gz
 aitag_meta_0010.7z,meta,130139,1699941711,,,meta/2026-02/140763/140763590.json.gz,meta/2026-03/142430/142430006.json.gz
 aitag_meta_0011.7z,meta,45216,592818145,,,meta/2026-03/142430/142430008.json.gz,meta/2026-03/142986/142986503.json.gz
-aitag_manifest_0001.7z,manifest,3,516770366,,,manifest/2025-01.jsonl,manifest/2025-03.jsonl
-aitag_manifest_0002.7z,manifest,3,654691774,,,manifest/2025-04.jsonl,manifest/2025-06.jsonl
-aitag_manifest_0003.7z,manifest,2,482224278,,,manifest/2025-07.jsonl,manifest/2025-08.jsonl
+aitag_manifest_0001.7z,manifest,3,516770366,888eebf048fce625bae166ee7011c2c12d112cea8f484ff9ecd0014d4b680f36,888eebf048fce625bae166ee7011c2c12d112cea8f484ff9ecd0014d4b680f36,manifest/2025-01.jsonl,manifest/2025-03.jsonl
+aitag_manifest_0002.7z,manifest,3,654691774,11382c5333e5b76c245afc2e6607c941514ad9391a9912a0222fff8e91279e9d,11382c5333e5b76c245afc2e6607c941514ad9391a9912a0222fff8e91279e9d,manifest/2025-04.jsonl,manifest/2025-06.jsonl
+aitag_manifest_0003.7z,manifest,2,482224278,8bd6b12b6ae2e6d1972ed6f70076a7ca0c5356ec46a62c7de0015250fa49653c,8bd6b12b6ae2e6d1972ed6f70076a7ca0c5356ec46a62c7de0015250fa49653c,manifest/2025-07.jsonl,manifest/2025-08.jsonl
 aitag_manifest_0004.7z,manifest,2,516039393,,,manifest/2025-09.jsonl,manifest/2025-10.jsonl
 aitag_manifest_0005.7z,manifest,2,586756390,,,manifest/2025-11.jsonl,manifest/2025-12.jsonl
 aitag_manifest_0006.7z,manifest,2,534269206,,,manifest/2026-01.jsonl,manifest/2026-02.jsonl
 aitag_manifest_0007.7z,manifest,1,247107010,,,manifest/2026-03.jsonl,manifest/2026-03.jsonl
-aitag_index_0001.7z,index,51,828194180,,,index/2025-01.all.jsonl,index/2026-03.ids.txt.原序_20261106.bak
-aitag_state.7z,state,6,135058379,,,state/img_queue.tsv,state/audit_detail_20261115.json
+aitag_index_0001.7z,index,51,828194180,c549b49d41c76c2cc18cbc186841a7ce11d68a2f965c9b53cf3540ca3f7aba60,c549b49d41c76c2cc18cbc186841a7ce11d68a2f965c9b53cf3540ca3f7aba60,index/2025-01.all.jsonl,index/2026-03.ids.txt.原序_20261106.bak
+aitag_state.7z,state,6,135058379,d38882292ec76a815863565c0496603fb83f597c6e271854b17591ca1a91fa56,d38882292ec76a815863565c0496603fb83f597c6e271854b17591ca1a91fa56,state/img_queue.tsv,state/audit_detail_20261115.json
