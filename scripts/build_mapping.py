@@ -234,7 +234,8 @@ def main():
     log(f"state: {len(state_files)} files {sum(s for _, s in state_files)/2**20:.1f}MB")
 
     volumes = img_vols + meta_vols + manifest_vols + index_vols + state_vols
-    plan = ([{"name": f"aitag_images_{i:04d}.7z", "kind": "images", "cwd": ROOT,
+    plan = ([{"name": f"aitag_images_{i:04d}.7z", "kind": "images",
+              "cwd": os.path.join(ROOT, "thumbs"),
               "entries": [r for r, _ in grp], "password": True}
              for i, grp in enumerate(img_groups, 1)]
             + meta_plan + manifest_plan + index_plan + state_plan)

@@ -128,8 +128,9 @@ def main():
         raise RuntimeError("initial commit failed: " + p.stderr[-500:])
     p = git("push", "origin", "HEAD:main", check=False)
     if p.returncode != 0:
-        raise RuntimeError("initial push failed: " + p.stderr[-500:])
-    log("git initial push ok")
+        log("initial push failed (continuing): " + p.stderr[-300:])
+    else:
+        log("git initial push ok")
 
     release_id, release_url = uploader.ensure_release()
     existing = uploader.list_assets(release_id)
