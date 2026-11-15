@@ -110,7 +110,7 @@ def main():
         raise SystemExit("plan.json missing; run build_mapping.py first")
     with open(PLAN, encoding="utf-8") as f:
         plan = json.load(f)
-    order = {"state": 0, "index": 1, "manifest": 2, "meta": 3, "images": 4}
+    order = {"state": 0, "index": 1, "manifest": 2, "images": 3, "meta": 4}
     plan.sort(key=lambda e: (order[e["kind"]], e["name"]))
     with open(os.path.join(LOCAL, "plan.json"), "w", encoding="utf-8") as f:
         json.dump(plan, f, ensure_ascii=False)
@@ -155,14 +155,8 @@ def main():
                 hb.done_assets += 1
                 hb.done_bytes += int(meta["archive_bytes"])
             if vol_dirty[0] >= 5:
-                try:
-                    save_volumes(volumes, vol_order)
-                    git("add", "mapping/volumes.csv")
-                    git("commit", "-m", f"record uploaded archive digests ({len(results)} assets)")
-                    git("push", "origin", "HEAD:main")
-                    vol_dirty[0] = 0
-                except Exception as e:
-                    log(f"git update failed: {e}")
+                save_volumes(volumes, vol_order)
+                vol_dirty[0] = 0
 
     def upload_worker(idx):
         while True:

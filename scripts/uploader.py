@@ -130,8 +130,9 @@ def upload(path, name, release_id, existing=None, retries=8):
     existing = existing or {}
     a = existing.get(name)
     size = os.path.getsize(path)
-    if a and a.get("size") == size and a.get("state") == "uploaded":
-        return {"skipped": True, "size": size, "digest": (a.get("digest") or "").replace("sha256:", ""), "id": a["id"]}
+    if a and a.get("size") == size:
+        return {"skipped": True, "size": size, "digest": (a.get("digest") or "").replace("sha256:", ""),
+                "id": a["id"], "state": a.get("state")}
     if a:
         log(f"asset {name} exists with size {a.get('size')} != {size}, deleting")
         delete_asset(a["id"])
