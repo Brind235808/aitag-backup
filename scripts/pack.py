@@ -48,11 +48,15 @@ def pack(entry):
     if os.path.isfile(out):
         os.remove(out)
     kept, missing = [], []
-    for rel in entry["entries"]:
-        if os.path.isfile(os.path.join(entry["cwd"], rel)):
-            kept.append(rel)
-        else:
-            missing.append(rel)
+    if entry["kind"] == "meta":
+        # 1.37M per-file stats cost more than the read itself; meta tree is complete
+        kept = list(entry["entries"])
+    else:
+        for rel in entry["entries"]:
+            if os.path.isfile(os.path.join(entry["cwd"], rel)):
+                kept.append(rel)
+            else:
+                missing.append(rel)
     if missing:
         log(f"pack {name}: {len(missing)} files missing on disk, skipped")
         with open(os.path.join(LOCAL, "missing_at_pack.tsv"), "a", encoding="utf-8") as f:
