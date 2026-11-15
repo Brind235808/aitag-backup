@@ -138,8 +138,10 @@ def main():
     q = queue.Queue(maxsize=PACK_AHEAD)
     stop_evt = threading.Event()
     results = {}
+    failures = {}
     results_lock = threading.Lock()
     vol_dirty = [0]
+    fail_streak = [0]
 
     def record(name, meta, up):
         with results_lock:
@@ -175,9 +177,16 @@ def main():
                 up = uploader.upload(packer.archive_path(entry), entry["name"], release_id,
                                      existing=existing, retries=8)
                 record(entry["name"], meta, up)
+                with results_lock:
+                    fail_streak[0] = 0
             except Exception as e:
-                log(f"FATAL upload {entry['name']}: {e}")
-                stop_evt.set()
+                log(f"upload failed {entry['name']}: {e}")
+                with results_lock:
+                    failures[entry["name"]] = str(e)
+                    fail_streak[0] += 1
+                    if fail_streak[0] >= 5:
+                        log("5 consecutive upload failures, stopping pipeline")
+                        stop_evt.set()
             finally:
                 with hb.lock:
                     if entry["name"] in hb.current:
@@ -199,10 +208,20 @@ def main():
             continue
         hb.status = f"uploading {entry['kind']}"
         log(f"queue {i}/{len(plan)} {entry['name']} {meta['archive_bytes']/2**30:.2f}GB")
-        q.put((entry, meta))
+        while not stop_evt.is_set():
+            try:
+                q.put((entry, meta), timeout=10)
+                break
+            except queue.Full:
+                continue
 
     for _ in workers:
-        q.put(None)
+        while True:
+            try:
+                q.put(None, timeout=10)
+                break
+            except queue.Full:
+                continue
     for w in workers:
         w.join()
     hb.stop_evt.set()
@@ -218,8 +237,9 @@ def main():
 
     with open(os.path.join(LOCAL, "DONE.json"), "w", encoding="utf-8") as f:
         json.dump({"finished": time.strftime("%Y-%m-%dT%H:%M:%S"), "assets": len(results),
-                   "bytes": hb.done_bytes}, f)
-    log(f"pipeline finished: assets={len(results)}")
+                   "bytes": hb.done_bytes, "failed": failures,
+                   "stopped_early": stop_evt.is_set()}, f, ensure_ascii=False)
+    log(f"pipeline finished: assets={len(results)} failed={len(failures)} stopped_early={stop_evt.is_set()}")
 
 
 if __name__ == "__main__":
