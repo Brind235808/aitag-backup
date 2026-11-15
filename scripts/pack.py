@@ -45,6 +45,8 @@ def pack(entry):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     os.makedirs(os.path.join(LOCAL, "lists"), exist_ok=True)
     os.makedirs(os.path.join(LOCAL, "packed"), exist_ok=True)
+    if os.path.isfile(out):
+        os.remove(out)
     kept, missing = [], []
     for rel in entry["entries"]:
         if os.path.isfile(os.path.join(entry["cwd"], rel)):
