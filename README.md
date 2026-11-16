@@ -26,14 +26,21 @@ https://github.com/Brind235808/aitag-backup/releases/tag/data-v1
 | `aitag_state_*.7z` | 明文 | 抓取队列、完成/404 清单、审计汇总 |
 | `aitag_index_*.7z` | 明文 | 按月 id 清单、索引 JSONL |
 | `aitag_manifest_*.7z` | 明文 | 解析后的结构化清单（含 prompt/negative/采样参数） |
-| `aitag_meta_*.7z` | 明文 | 原始 detail JSON（`meta/月/前6位/id.json.gz`） |
+| `aitag_meta_0001~0002.7z` | 明文 | 原始 detail JSON（`meta/月/前6位/id.json.gz`），文件直接在归档根下 |
+| `aitag_meta_0003~0011.7z` | 明文 | 同上；7z 内含单个 `aitag_meta_XXXX.7z.tar`（tar 流式打包） |
 | `aitag_images_*.7z` | **加密** | webp 图片，条目路径与 `images.csv.gz` 的 `relpath` 一致 |
+
+共 120 个归档，合计约 **174.7 GiB**（100 个图片包 + 11 个原始元数据包 + 7 个 manifest 包 + 1 个 index 包 + 1 个 state 包）。
 
 ## 解压
 
 ```bash
-# 明文元数据
+# 明文元数据（0001/0002）
 7z x aitag_meta_0001.7z
+
+# 明文元数据（0003~0011：先出 tar，再解 tar）
+7z x aitag_meta_0003.7z
+tar xf aitag_meta_0003.7z.tar
 
 # 加密图片（密码向仓库所有者获取）
 7z x aitag_images_0001.7z
