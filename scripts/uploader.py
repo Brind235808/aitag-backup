@@ -126,7 +126,7 @@ def delete_asset(asset_id):
         log(f"delete asset {asset_id} failed: {e}")
 
 
-def upload(path, name, release_id, existing=None, retries=8):
+def upload(path, name, release_id, existing=None, retries=8, proxy=None):
     existing = existing or {}
     a = existing.get(name)
     size = os.path.getsize(path)
@@ -140,12 +140,14 @@ def upload(path, name, release_id, existing=None, retries=8):
     for attempt in range(1, retries + 1):
         hr = HashReader(path)
         t0 = time.time()
+        use_proxy = proxy if attempt <= 4 else None
         try:
             r = requests.post(
                 f"{UPLOADS}/repos/{OWNER}/{REPO}/releases/{release_id}/assets",
                 params={"name": name},
                 headers=headers({"Content-Type": "application/octet-stream"}),
                 data=hr,
+                proxies={"http": use_proxy, "https": use_proxy} if use_proxy else None,
                 timeout=(30, 7200),
             )
             elapsed = max(time.time() - t0, 0.01)

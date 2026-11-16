@@ -22,6 +22,8 @@ PLAN = os.path.join(LOCAL, "plan.json")
 CONCURRENCY = int(os.environ.get("AITAG_UPLOAD_CONC", "8"))
 PACK_AHEAD = int(os.environ.get("AITAG_PACK_AHEAD", "16"))
 PACK_WORKERS = int(os.environ.get("AITAG_PACK_WORKERS", "4"))
+PROXY_URL = os.environ.get("AITAG_PROXY", "")
+PROXY_COUNT = int(os.environ.get("AITAG_PROXY_COUNT", "0"))
 
 
 def load_password():
@@ -170,8 +172,9 @@ def main():
             with hb.lock:
                 hb.current.append(entry["name"])
             try:
+                proxy = PROXY_URL if (PROXY_URL and idx < PROXY_COUNT) else None
                 up = uploader.upload(packer.archive_path(entry), entry["name"], release_id,
-                                     existing=existing, retries=8)
+                                     existing=existing, retries=8, proxy=proxy)
                 record(entry["name"], meta, up)
                 with results_lock:
                     fail_streak[0] = 0
