@@ -68,6 +68,33 @@ def pack(entry):
     with open(lst, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(kept))
 
+    if entry["kind"] == "meta":
+        # 7z per-file overhead on ~270k tiny files is catastrophic; stream via tar first
+        tar_path = os.path.join(LOCAL, "tmp", name + ".tar")
+        os.makedirs(os.path.dirname(tar_path), exist_ok=True)
+        log(f"tar start {name} entries={len(kept)}")
+        t0 = time.time()
+        tp = subprocess.run([r"C:\Windows\System32\tar.exe", "-cf", tar_path, "-T", lst],
+                            cwd=entry["cwd"], capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
+        if tp.returncode != 0:
+            raise RuntimeError(f"tar failed {name}: {(tp.stderr or '')[-500:]}")
+        log(f"tar done {name} {os.path.getsize(tar_path)/2**30:.2f}GB {time.time()-t0:.0f}s")
+        ap = subprocess.run([SEVEN, "a", "-t7z", out, name + ".tar", "-mx=0", "-bso0", "-bsp0", "-y"],
+                            cwd=os.path.dirname(tar_path), capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
+        os.remove(tar_path)
+        if ap.returncode not in (0, 1):
+            raise RuntimeError(f"7z failed {name} rc={ap.returncode}: {(ap.stderr or '')[-500:]}")
+        size = os.path.getsize(out)
+        meta = {"name": name, "kind": entry["kind"], "entries": len(kept),
+                "archive_bytes": size, "elapsed_s": round(time.time() - t0, 1),
+                "password": entry["password"], "layout": "tar-in-7z"}
+        with open(marker, "w", encoding="utf-8") as f:
+            json.dump(meta, f, indent=1)
+        log(f"pack done {name} {size/2**30:.2f}GB {meta['elapsed_s']}s")
+        return meta
+
     args = [SEVEN, "a", "-t7z", out, "@" + lst, "-bso0", "-bsp0", "-y"]
     if entry["kind"] == "images":
         args += ["-mx=0", "-ms=off", "-mhe=on", "-p" + load_password()]
