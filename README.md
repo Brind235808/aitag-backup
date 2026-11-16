@@ -32,6 +32,16 @@ https://github.com/Brind235808/aitag-backup/releases/tag/data-v1
 
 共 120 个归档，合计约 **174.7 GiB**（100 个图片包 + 11 个原始元数据包 + 7 个 manifest 包 + 1 个 index 包 + 1 个 state 包）。
 
+## 追加数据：2026-04 ~ 2026-11（Release `data-v2`）
+
+https://github.com/Brind235808/aitag-backup/releases/tag/data-v2
+
+- **610,059 个作品**（创作日期 2026-04-01 ~ 2026-11-14），**仅源数据，不含图片**
+- 9 个分卷：`aitag_v2_meta_0001~0006.7z`（原始 detail payload，`raw/<YYYY-MM>/<id>.json.gz`）、
+  `aitag_v2_manifest_0001.7z`（解析记录）、`aitag_v2_index_0001.7z`、`aitag_v2_state.7z`
+- 映射：`mapping_v2/works.csv.gz`（610,059 行）、`mapping_v2/volumes.csv`（分卷清单）
+- 解压：把 9 个分卷全部解到**同一个目录**（详见发布页内的解压说明）
+
 ## 解压
 
 ```bash
